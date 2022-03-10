@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rspec'
+require 'pry'
 require_relative '../../lib/models/lecture_video_collection'
 
 RSpec.describe LectureVideoCollection do
@@ -11,7 +12,7 @@ RSpec.describe LectureVideoCollection do
   let(:fixed_attributes) do
     JSON.parse fixed_data
   end
-  subject do
+  subject(:lecture_video_collection) do
     described_class.new fixed_attributes
   end
   describe '#collect' do
@@ -20,11 +21,16 @@ RSpec.describe LectureVideoCollection do
       it 'logs the attempted request'
     end
     it 'enumerates the videos in the collection' do
-      expect(subject.collect.count).to eql 85
+      expect(lecture_video_collection.collect.count).to eql 85
     end
   end
 
   describe '#enqueue_for_download' do
-    it 'sends a batch to the downloader'
+    subject(:queue) do
+      lecture_video_collection.enqueue_for_download
+    end
+    it 'sends a batch to the downloader' do
+      expect(subject.count).to eql 14
+    end
   end
 end
