@@ -1,0 +1,4 @@
+FROM conda/miniconda3
+
+RUN pip install youtube-dl
+RUN pip install flask
