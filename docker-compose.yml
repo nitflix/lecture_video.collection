@@ -1,8 +1,11 @@
 version: '3'
 
 services:
+  # Store data efficiently in encrypted blocks
   database:
     image: restic/rest-server
+
+  # Download videos and print status updates to condole
   queue:
     image: youtube-dl:development
     command: flask run
@@ -13,6 +16,9 @@ services:
       - FLASK_APP=downloader
     volumes:
       - .:/work
+
+  # Download json for url and thumbnail for presentation
+  # Maybe alows for selective enqueue since some videos witll be not good
   collection:
     image: ruby
     working_dir: /work
