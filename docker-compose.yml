@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  test:
+    image: ruby
+    working_dir: /work
+    volumes:
+      - .:/work
