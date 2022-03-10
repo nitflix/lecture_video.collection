@@ -1,7 +1,19 @@
 version: '3'
 
 services:
-  test:
+  database:
+    image: restic/rest-server
+  queue:
+    image: youtube-dl:development
+    command: flask run
+    working_dir: /work
+    ports:
+      - 5000:5000
+    environment:
+      - FLASK_APP=downloader
+    volumes:
+      - .:/work
+  collection:
     image: ruby
     working_dir: /work
     volumes:
