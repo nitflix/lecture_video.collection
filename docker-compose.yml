@@ -3,24 +3,42 @@ version: '3'
 services:
   # Store data efficiently in encrypted blocks
   database:
-    image: restic/rest-server
-
-  # Download videos and print status updates to condole
-  queue:
-    image: youtube-dl:development
-    command: flask run
+    build:
+      context: .
+      dockerfile: Dockerfile.database
     working_dir: /work
-    ports:
-      - 5000:5000
-    environment:
-      - FLASK_APP=downloader
+    command: bin/rest-server --no-auth --append-only --path /usr/local/data
     volumes:
       - .:/work
+      - ./tmp:/usr/local/data
+
 
   # Download json for url and thumbnail for presentation
   # Maybe alows for selective enqueue since some videos witll be not good
-  collection:
-    image: ruby
+  # collection:
+  #   image: ruby
+  #   working_dir: /work
+  #   command: ['./wait-for-it.sh', 'queue:5002', 'bin/collect_lecture_videos']
+  #   volumes:
+  #     - .:/work
+  #   depends_on:
+  #     - queue
+  # Download videos and print status updates to condole
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile.youtube-dl
+    command: youtube-dl "ytsearch:$VIDEO_TITLE" --exec 'restic backup {} --tag test && rm {}'
     working_dir: /work
+    ports:
+      - 5002:5002
+    environment:
+      - FLASK_APP=downloader
+      - RESTIC_REPOSITORY=rest:http://database:8000
+      - RESTIC_PASSWORD=test
+      - VIDEO_TITLE=${VIDEO_TITLE}
     volumes:
       - .:/work
+    depends_on:
+      - database
+
