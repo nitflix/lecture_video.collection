@@ -21,7 +21,7 @@ RSpec.describe LectureVideoCollection do
       it 'logs the attempted request'
     end
     it 'enumerates the videos in the collection' do
-      expect(lecture_video_collection.collect.count).to eql 85
+      expect(lecture_video_collection.video_courses.count).to eql 85
     end
   end
 
