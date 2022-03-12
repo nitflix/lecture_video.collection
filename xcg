@@ -1,0 +1,5 @@
+make download -e COURSE_HREF='resources/res-6-008-digital-signal-processing-spring-2011' -e VIDEO_TITLE="'Lecture 16: Digital Butterworth Filters'"
+make download -e COURSE_HREF='resources/res-6-008-digital-signal-processing-spring-2011' -e VIDEO_TITLE="'Lecture 17: Design of FIR Digital Filters'"
+make download -e COURSE_HREF='resources/res-6-008-digital-signal-processing-spring-2011' -e VIDEO_TITLE="'Lecture 18: Computation of the Discrete Fourier Transform, Part 1'"
+make download -e COURSE_HREF='resources/res-6-008-digital-signal-processing-spring-2011' -e VIDEO_TITLE="'Lecture 19: Computation of the Discrete Fourier Transform, Part 2'"
+make download -e COURSE_HREF='resources/res-6-008-digital-signal-processing-spring-2011' -e VIDEO_TITLE="'Lecture 20: Computation of the Discrete Fourier Transform, Part 3'"
