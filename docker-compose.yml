@@ -7,10 +7,11 @@ services:
       context: .
       dockerfile: Dockerfile.database
     working_dir: /work
-    command: bin/rest-server --no-auth --append-only --path /usr/local/data
+    command: /usr/local/bin/rest-server --no-auth --append-only --path /usr/local/data
     volumes:
-      - .:/work
-      - ./tmp:/usr/local/data
+      - ./bin:/usr/local/bin
+      - /Volumes/y00000001:/work
+      - /Volumes/y00000001/nitflix:/usr/local/data
 
 
   # Download json for url and thumbnail for presentation
@@ -28,7 +29,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.youtube-dl
-    command: youtube-dl "ytsearch:$VIDEO_TITLE" --exec 'restic backup {} --tag test && rm {}'
+    command: youtube-dl "ytsearch:$VIDEO_TITLE" --exec 'restic backup {} --tag $COURSE_HREF && rm {}'
     working_dir: /work
     ports:
       - 5002:5002
@@ -36,9 +37,10 @@ services:
       - FLASK_APP=downloader
       - RESTIC_REPOSITORY=rest:http://database:8000
       - RESTIC_PASSWORD=test
+      - COURSE_HREF=${COURSE_HREF}
       - VIDEO_TITLE=${VIDEO_TITLE}
     volumes:
-      - .:/work
+      - /Volumes/y00000001:/work
     depends_on:
       - database
 
