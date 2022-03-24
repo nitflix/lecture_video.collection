@@ -6,4 +6,4 @@
 | . as $key
 | $input[$key][][]
 | . as $title
-| @sh "make download -e project_name=\"\($project_name)\" -e COURSE_HREF=\($key) -e VIDEO_TITLE=\"\($title)\""
+| @sh "make \($job) -e project_name=\"\($project_name)\" -e COURSE_HREF=\($key) -e VIDEO_TITLE=\"\($title)\""
