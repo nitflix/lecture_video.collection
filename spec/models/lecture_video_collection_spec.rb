@@ -13,7 +13,7 @@ RSpec.describe LectureVideoCollection do
     JSON.parse fixed_data
   end
   subject(:lecture_video_collection) do
-    described_class.new fixed_attributes
+    described_class.new fixed_attributes, 'engineering'
   end
   describe '#collect' do
     context 'when the response is a 404' do

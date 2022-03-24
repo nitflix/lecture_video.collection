@@ -8,19 +8,31 @@ require 'json'
 
 # nodoc
 class LectureVideoCollection
+  attr_reader :collection_name
   def initialize(attributes = {}, collection_name)
     @attributes = attributes
-    @buffer = []
+    @buffer = {}
+    @collection_name = collection_name
   end
 
   def enqueue_for_download
     video_courses.flat_map do |course|
+      puts '#' * 50, course['href']
       response = Fetcher.new(course).response
 
-      @buffer += [Document.new(response).titles]
+      @buffer[course['href']] = [Document.new(response).titles]
     end
 
     File.open("/work/tmp/#{collection_name}.json", 'w') do |file|
+    #   then run  a container with the environment
+    #   and babysit until they are all downloaded
+    #   maybe even starting with lowest quality audio
+    #   then video
+    #   and thumbnails
+    # individuaal environment files for each container
+    #   notes/course['href']
+    #     export COURSE_HREF=
+    #     export LECTURE_TITLE=
       file.write @buffer.to_json
     end
   end
