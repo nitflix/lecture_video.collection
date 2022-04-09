@@ -21,6 +21,7 @@ services:
     working_dir: /work
     volumes:
       - .:/work
+      - bundle:/usr/local/bundle
   #   depends_on:
   #     - queue
   # Download videos and print status updates to condole
@@ -65,3 +66,4 @@ services:
 volumes:
   subtitles: {}
   thumbnails: {}
+  bundle: {}
