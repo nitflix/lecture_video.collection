@@ -5,11 +5,13 @@ require 'mechanize'
 require 'net/http'
 require 'open-uri'
 require 'json'
+require_relative './bot'
 
 # nodoc
 class LectureVideoCollection
-  attr_reader :collection_name
-  def initialize(attributes = {}, collection_name)
+  attr_reader :collection_name, :bot
+  def initialize(attributes = {}, collection_name, bot)
+    @bot = bot
     @attributes = attributes
     @buffer = {}
     @collection_name = collection_name
@@ -17,8 +19,7 @@ class LectureVideoCollection
 
   def enqueue_for_download
     video_courses.flat_map do |course|
-      puts '#' * 50, course['href']
-      response = Fetcher.new(course).response
+      response = Fetcher.new(course, bot).response
 
       @buffer[course['href']] = [Document.new(response).titles]
     end
@@ -46,9 +47,10 @@ end
 
 # nodoc
 class Fetcher
-  attr_reader :course
+  attr_reader :course, :bot
 
-  def initialize(course)
+  def initialize(course, bot)
+    @bot = bot
     @course = course
     @buffer = []
   end
@@ -56,14 +58,6 @@ class Fetcher
   PATTERNS = %w[lecture-videos video-lectures]
   DOMAIN = 'https://ocw.mit.edu'
 
-  def bot
-    return @bot if @bot
-
-    @bot ||= Mechanize.new
-    @bot.follow_meta_refresh
-    @bot.redirect_ok
-    @bot
-  end
 
   EmptyTempFile = Class.new Tempfile
 

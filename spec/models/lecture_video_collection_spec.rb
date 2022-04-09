@@ -12,8 +12,13 @@ RSpec.describe LectureVideoCollection do
   let(:fixed_attributes) do
     JSON.parse fixed_data
   end
+
+  let(:bot) do
+    double(:Bot, get: '')
+  end
+
   subject(:lecture_video_collection) do
-    described_class.new fixed_attributes, 'engineering'
+    described_class.new fixed_attributes, 'engineering', bot
   end
   describe '#collect' do
     context 'when the response is a 404' do
@@ -27,10 +32,10 @@ RSpec.describe LectureVideoCollection do
 
   describe '#enqueue_for_download' do
     subject(:queue) do
-      lecture_video_collection.enqueue_for_download
     end
     it 'sends a batch to the downloader' do
-      expect(subject.count).to eql 14
+      expect_any_instance_of(Fetcher).to receive(:new).exactly(14).times.and_return ''
+      lecture_video_collection.enqueue_for_download
     end
   end
 end
