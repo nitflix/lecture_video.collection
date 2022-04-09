@@ -25,16 +25,28 @@ services:
   #   depends_on:
   #     - queue
   # Download videos and print status updates to condole
-  queue:
+  thumbnail:
     build:
       context: .
       dockerfile: Dockerfile.youtube-dl
-    command: youtube-dl --get-thumbnail "ytsearch:$VIDEO_TITLE" --exec 'restic backup {} --tag $COURSE_HREF && rm {}'
+    command: youtube-dl --write-thumbnail "ytsearch:$VIDEO_TITLE"
     working_dir: /work
     ports:
       - 5002:5002
     environment:
-      - FLASK_APP=downloader
+      - COURSE_HREF=${COURSE_HREF}
+      - VIDEO_TITLE=${VIDEO_TITLE}
+    volumes:
+      - thumbnails:/usr/local/thumbnails/
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile.youtube-dl
+    command: youtube-dl "ytsearch:$VIDEO_TITLE" --exec 'restic backup {} --tag $COURSE_HREF && rm {}'
+    working_dir: /work
+    ports:
+      - 5002:5002
+    environment:
       - RESTIC_REPOSITORY=rest:http://database:8000
       - RESTIC_PASSWORD=test
       - COURSE_HREF=${COURSE_HREF}
@@ -48,15 +60,13 @@ services:
       context: .
       dockerfile: Dockerfile.youtube-dl
     command: youtube-dl --skip-download --write-auto-sub --sub-lang $LANGUAGES "ytsearch:$VIDEO_TITLE" #--exec 'restic backup {} --tag $COURSE_HREF && rm {}'
-    working_dir: /work
+    working_dir: /usr/local/work
     environment:
       - LANGUAGES=en,nl,de,ru,es,fr
-      - RESTIC_REPOSITORY=rest:http://database:8000
-      - RESTIC_PASSWORD=test
-      - COURSE_HREF=${COURSE_HREF}
       - VIDEO_TITLE=${VIDEO_TITLE}
     volumes:
-      - /Volumes/y00000001:/work
-    depends_on:
-      - database
+      - subtitles:/usr/local/work
 
+volumes:
+  subtitles: {}
+  thumbnails: {}
