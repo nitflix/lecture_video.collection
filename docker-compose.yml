@@ -16,12 +16,11 @@ services:
 
   # Download json for url and thumbnail for presentation
   # Maybe alows for selective enqueue since some videos witll be not good
-  # collection:
-  #   image: ruby
-  #   working_dir: /work
-  #   command: ['./wait-for-it.sh', 'queue:5002', 'bin/collect_lecture_videos']
-  #   volumes:
-  #     - .:/work
+  collection:
+    image: ruby
+    working_dir: /work
+    volumes:
+      - .:/work
   #   depends_on:
   #     - queue
   # Download videos and print status updates to condole
@@ -31,21 +30,17 @@ services:
       dockerfile: Dockerfile.youtube-dl
     command: youtube-dl --write-thumbnail "ytsearch:$VIDEO_TITLE"
     working_dir: /work
-    ports:
-      - 5002:5002
     environment:
       - COURSE_HREF=${COURSE_HREF}
       - VIDEO_TITLE=${VIDEO_TITLE}
     volumes:
-      - thumbnails:/usr/local/thumbnails/
+      - thumbnails:/work
   queue:
     build:
       context: .
       dockerfile: Dockerfile.youtube-dl
     command: youtube-dl "ytsearch:$VIDEO_TITLE" --exec 'restic backup {} --tag $COURSE_HREF && rm {}'
     working_dir: /work
-    ports:
-      - 5002:5002
     environment:
       - RESTIC_REPOSITORY=rest:http://database:8000
       - RESTIC_PASSWORD=test

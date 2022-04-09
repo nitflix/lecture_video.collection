@@ -1,6 +1,6 @@
 drive=$1
 partials=$(ls $drive/*.part | split -l 1)
-for item in $(ls x* | head -n 1); do
+for item in $(ls x*); do
   _item=$(cat $item)
   make 'download' \
     -e batch=$item \
