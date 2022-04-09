@@ -23,7 +23,7 @@ download:
 # create a set of make commands
 # split it into batches
 # download the batches
-job ?= download # subtitles
+# job ?= download # subtitles
 
 $(job): tmp/teachingandeducation.json
 	cat $? | jq --arg job $@ --arg project_name $(project_name) -rf download.jq | split -l 20 -a 7
