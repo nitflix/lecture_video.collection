@@ -5,14 +5,14 @@ RSpec.describe Worker do
     double(Redis)
   end
 
-  describe '#enqueue_for_download' do
-    context 'when the response is a 404' do
-      # it 'matches againsts the alternate pattern'
-      # it 'logs the attempted request'
-    end
+  let(:client) do
+    double(Client)
+  end
+
+  describe '#write' do
 
     subject(:worker) do
-      described_class.new db, collection
+      described_class.new db, collection, client
     end
     let(:collection) do
       double(LectureVideoCollection)
@@ -27,6 +27,12 @@ RSpec.describe Worker do
       expect(collection).to receive(:each).and_return mock_collection
       expect(db).to receive(:set).exactly(14).times
       worker.write
+    end
+
+    it 'writes the response from the client to the entry in the database' do
+      expect(collection).to receive(:each).and_return mock_collection
+      expect(db).to receive(:set).exactly(14).times
+      worker.work
     end
   end
 end
