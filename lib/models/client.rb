@@ -1,8 +1,50 @@
 require 'nokogiri'
 require 'mechanize'
 require 'json'
-class Client
+require_relative './document'
+require_relative './bot'
 
+class Client
+  attr_writer :href
+
+  def initialize(bot)
+    @bot = bot
+  end
+
+  def document_titles
+    Document.new(response).titles
+  end
+
+
+  EmptyTempFile = Class.new Tempfile
+
+  def response
+    bot.follow_meta_refresh
+    bot.redirect_ok
+    buffer = []
+    PATTERNS.each do |pattern|
+      buffer << bot.get(URI("#{url}/video_galleries/#{pattern}"))
+    rescue Mechanize::ResponseCodeError => e
+      buffer << e
+    end
+
+    buffer.detect do |obj|
+      obj.is_a? Mechanize::Page
+    end
+  end
+
+  def url
+    "#{DOMAIN}/#{href}"
+  end
+
+  PATTERNS = %w[lecture-videos video-lectures].freeze
+  DOMAIN = 'https://ocw.mit.edu'.freeze
+
+  private_constant :PATTERNS, :DOMAIN
+
+  private
+
+  attr_reader :href, :bot
 end
 #   def enqueue_for_download
 #     video_courses.flat_map do |course|
@@ -27,41 +69,3 @@ end
 #   end
 #
 # # nodoc
-# class Fetcher
-#   attr_reader :course
-#
-#   def initialize(course)
-#     @course = course
-#     @buffer = []
-#   end
-#
-#   PATTERNS = %w[lecture-videos video-lectures]
-#   DOMAIN = 'https://ocw.mit.edu'
-#
-#   def bot
-#     return @bot if @bot
-#
-#     @bot ||= Mechanize.new
-#     @bot.follow_meta_refresh
-#     @bot.redirect_ok
-#     @bot
-#   end
-#
-#   EmptyTempFile = Class.new Tempfile
-#
-#   def response
-#     PATTERNS.each do |pattern|
-#       @buffer << bot.get(URI("#{url}/#{pattern}"))
-#     rescue Mechanize::ResponseCodeError
-#       @buffer << EmptyTempFile.new
-#     end
-#
-#     @buffer.select do |obj|
-#       obj.is_a? Mechanize::Page
-#     end.first || Nokogiri::HTML(Tempfile.new)
-#   end
-#
-#   def url
-#     "#{DOMAIN}/#{course['href']}"
-#   end
-# END
