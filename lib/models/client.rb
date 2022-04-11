@@ -1,6 +1,9 @@
 require 'nokogiri'
 require 'mechanize'
 require 'json'
+class Client
+
+end
 #   def enqueue_for_download
 #     video_courses.flat_map do |course|
 #       puts '#' * 50, course['href']
