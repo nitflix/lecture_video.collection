@@ -40,7 +40,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.youtube-dl
-    command: youtube-dl "ytsearch:$VIDEO_TITLE" --exec 'restic backup {} --tag $COURSE_HREF && rm {}'
+    command: youtube-dl "ytsearch:$VIDEO_TITLE" --match-filter "channel = 'MIT OpenCourseWare'" --exec 'restic backup {} --tag $COURSE_HREF && rm {}'
     working_dir: /work
     environment:
       - RESTIC_REPOSITORY=rest:http://database:8000
