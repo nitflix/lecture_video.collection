@@ -8,6 +8,12 @@ services:
       dockerfile: Dockerfile.database
     working_dir: /work
     command: /usr/local/bin/rest-server --no-auth --append-only --path /usr/local/data
+    environment:
+      - REDIS_HOST=upstream
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    depends_on:
+      - upstream
     volumes:
       - ./bin:/usr/local/bin
       - /Volumes/y00000001:/work
@@ -36,6 +42,13 @@ services:
       - VIDEO_TITLE=${VIDEO_TITLE}
     volumes:
       - thumbnails:/work
+  upstream:
+    image: redis
+    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    ports:
+      - 6379:6379
+    volumes:
+      - cache:/data
   queue:
     build:
       context: .
@@ -43,6 +56,9 @@ services:
     command: youtube-dl "ytsearch:$VIDEO_TITLE" --match-filter "channel = 'MIT OpenCourseWare'" --exec 'restic backup {} --tag $COURSE_HREF && rm {}'
     working_dir: /work
     environment:
+      - REDIS_HOST=upstream
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
       - RESTIC_REPOSITORY=rest:http://database:8000
       - RESTIC_PASSWORD=test
       - COURSE_HREF=${COURSE_HREF}
@@ -51,6 +67,7 @@ services:
       - /Volumes/y00000001:/work
     depends_on:
       - database
+      - upstream
   subtitles:
     build:
       context: .
@@ -67,3 +84,4 @@ volumes:
   subtitles: {}
   thumbnails: {}
   bundle: {}
+  cache: {}
