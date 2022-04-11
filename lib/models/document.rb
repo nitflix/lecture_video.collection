@@ -9,14 +9,6 @@ class Document
   end
 
   def titles
-    @titles ||= document.css('.medialisting a').map do |link|
-      link.attr('title')
-    end
-
-    @titles.compact
-  end
-
-  def document
-    response
+    @titles ||= response.css('.video-title').map(&:children)
   end
 end
